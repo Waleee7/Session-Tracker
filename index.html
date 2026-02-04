@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Track and analyze your throwing sessions - Shot Put, Discus, Hammer, Javelin, Weight Throw">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>ThrowTracker - Session Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="16" cy="16" r="8" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h1>ThrowTracker</h1>
+                </div>
+                <div class="streak-badge" id="streakBadge">
+                    <span class="streak-flame">🔥</span>
+                    <span class="streak-count" id="streakCount">0</span>
+                    <span class="streak-label">day streak</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Alert Banner -->
+        <div class="alert-banner" id="alertBanner">
+            <div class="alert-content">
+                <span class="alert-icon" id="alertIcon">⚠️</span>
+                <span class="alert-text" id="alertText"></span>
+                <button class="alert-close" id="alertClose">&times;</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="log">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span class="nav-label">Log</span>
+            </button>
+            <button class="nav-tab" data-tab="history">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8v4l3 3"/>
+                    <circle cx="12" cy="12" r="9"/>
+                </svg>
+                <span class="nav-label">History</span>
+            </button>
+            <button class="nav-tab" data-tab="analytics">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="M7 16l4-4 4 4 5-6"/>
+                </svg>
+                <span class="nav-label">Analytics</span>
+            </button>
+            <button class="nav-tab" data-tab="profile">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                </svg>
+                <span class="nav-label">Profile</span>
+            </button>
+            <button class="nav-tab" data-tab="settings">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                </svg>
+                <span class="nav-label">Settings</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Log Session Tab -->
+            <section class="tab-content active" id="tab-log">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Log Session</h2>
+                        <span class="card-subtitle">Record your throwing practice</span>
+                    </div>
+                    
+                    <form id="sessionForm" class="session-form">
+                        <!-- Date -->
+                        <div class="form-group">
+                            <label for="sessionDate">Date</label>
+                            <input type="date" id="sessionDate" required>
+                        </div>
+
+                        <!-- Event Selection -->
+                        <div class="form-group">
+                            <label>Event</label>
+                            <div class="event-grid">
+                                <button type="button" class="event-btn" data-event="shot-put">
+                                    <div class="event-icon-wrapper">
+                                        <svg class="event-svg" viewBox="0 0 48 48">
+                                            <circle cx="24" cy="24" r="16" fill="currentColor"/>
+                                            <ellipse cx="20" cy="20" rx="4" ry="3" fill="rgba(255,255,255,0.3)"/>
+                                        </svg>
+                                    </div>
+                                    <span class="event-name">Shot Put</span>
+                                </button>
+                                <button type="button" class="event-btn" data-event="discus">
+                                    <div class="event-icon-wrapper">
+                                        <svg class="event-svg" viewBox="0 0 48 48">
+                                            <ellipse cx="24" cy="24" rx="18" ry="7" transform="rotate(-20 24 24)" fill="currentColor"/>
+                                            <ellipse cx="22" cy="22" rx="10" ry="3" transform="rotate(-20 22 22)" fill="rgba(255,255,255,0.2)"/>
+                                        </svg>
+                                    </div>
+                                    <span class="event-name">Discus</span>
+                                </button>
+                                <button type="button" class="event-btn" data-event="hammer">
+                                    <div class="event-icon-wrapper">
+                                        <svg class="event-svg" viewBox="0 0 48 48">
+                                            <circle cx="10" cy="38" r="7" fill="currentColor"/>
+                                            <line x1="15" y1="33" x2="38" y2="10" stroke="currentColor" stroke-width="2"/>
+                                            <circle cx="40" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                    </div>
+                                    <span class="event-name">Hammer</span>
+                                </button>
+                                <button type="button" class="event-btn" data-event="javelin">
+                                    <div class="event-icon-wrapper">
+                                        <svg class="event-svg" viewBox="0 0 48 48">
+                                            <line x1="4" y1="44" x2="44" y2="4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                            <polygon points="44,4 38,8 40,10" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <span class="event-name">Javelin</span>
+                                </button>
+                                <button type="button" class="event-btn" data-event="weight-throw">
+                                    <div class="event-icon-wrapper">
+                                        <svg class="event-svg" viewBox="0 0 48 48">
+                                            <rect x="14" y="26" width="20" height="18" rx="2" fill="currentColor"/>
+                                            <path d="M19 26V18C19 15 21 12 24 12C27 12 29 15 29 18V26" stroke="currentColor" stroke-width="3" fill="none"/>
+                                        </svg>
+                                    </div>
+                                    <span class="event-name">Weight</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="selectedEvent" required>
+                        </div>
+
+                        <!-- Session Type -->
+                        <div class="form-group">
+                            <label>Session Type</label>
+                            <div class="type-grid">
+                                <button type="button" class="type-btn" data-type="technique">
+                                    <svg class="type-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <circle cx="12" cy="12" r="6"/>
+                                        <circle cx="12" cy="12" r="2"/>
+                                    </svg>
+                                    <span>Technique</span>
+                                </button>
+                                <button type="button" class="type-btn" data-type="power">
+                                    <svg class="type-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+                                    </svg>
+                                    <span>Power</span>
+                                </button>
+                                <button type="button" class="type-btn" data-type="competition">
+                                    <svg class="type-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M6 9H4.5a2.5 2.5 0 010-5H6"/>
+                                        <path d="M18 9h1.5a2.5 2.5 0 000-5H18"/>
+                                        <path d="M4 22h16"/>
+                                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                                        <path d="M18 2H6v7a6 6 0 1012 0V2z"/>
+                                    </svg>
+                                    <span>Competition</span>
+                                </button>
+                                <button type="button" class="type-btn" data-type="recovery">
+                                    <svg class="type-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                        <path d="M13.73 21a2 2 0 01-3.46 0"/>
+                                    </svg>
+                                    <span>Recovery</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="selectedType" required>
+                        </div>
+
+                        <!-- Season -->
+                        <div class="form-group">
+                            <label>Season</label>
+                            <div class="season-toggle">
+                                <button type="button" class="season-btn active" data-season="indoor">
+                                    <svg class="season-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 21h18"/>
+                                        <path d="M5 21V7l7-4 7 4v14"/>
+                                        <path d="M9 21v-6h6v6"/>
+                                        <rect x="9" y="9" width="2" height="2"/>
+                                        <rect x="13" y="9" width="2" height="2"/>
+                                    </svg>
+                                    <span>Indoor</span>
+                                </button>
+                                <button type="button" class="season-btn" data-season="outdoor">
+                                    <svg class="season-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 2v4"/>
+                                        <path d="M12 18v4"/>
+                                        <path d="M4.93 4.93l2.83 2.83"/>
+                                        <path d="M16.24 16.24l2.83 2.83"/>
+                                        <path d="M2 12h4"/>
+                                        <path d="M18 12h4"/>
+                                        <path d="M4.93 19.07l2.83-2.83"/>
+                                        <path d="M16.24 7.76l2.83-2.83"/>
+                                    </svg>
+                                    <span>Outdoor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="selectedSeason" value="indoor">
+                        </div>
+
+                        <!-- Number of Throws -->
+                        <div class="form-group">
+                            <label for="throwCount">Number of Throws</label>
+                            <div class="stepper">
+                                <button type="button" class="stepper-btn minus" data-target="throwCount">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <path d="M5 12h14"/>
+                                    </svg>
+                                </button>
+                                <input type="number" id="throwCount" value="20" min="1" max="200" required>
+                                <button type="button" class="stepper-btn plus" data-target="throwCount">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <path d="M12 5v14M5 12h14"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Implement Weight -->
+                        <div class="form-group">
+                            <label for="implementWeight">Implement Weight</label>
+                            <div class="weight-input">
+                                <input type="number" id="implementWeight" step="0.01" placeholder="0.00" required>
+                                <select id="weightUnit">
+                                    <option value="kg">kg</option>
+                                    <option value="lb">lb</option>
+                                </select>
+                            </div>
+                            <div class="weight-presets" id="weightPresets"></div>
+                        </div>
+
+                        <!-- RPE Slider -->
+                        <div class="form-group">
+                            <label>Session Intensity (RPE)</label>
+                            <div class="rpe-container">
+                                <div class="rpe-value-display">
+                                    <span class="rpe-number" id="rpeDisplay">5</span>
+                                    <span class="rpe-descriptor" id="rpeDescriptor">Moderate</span>
+                                </div>
+                                <input type="range" id="rpeSlider" min="1" max="10" value="5" class="rpe-slider">
+                                <div class="rpe-labels">
+                                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                                    <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PR Day Toggle -->
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <span class="toggle-text">
+                                    <span class="pr-star">⭐</span>
+                                    PR Day!
+                                </span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="prDay">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- PR Distance (conditional) -->
+                        <div class="form-group pr-distance-group" id="prDistanceGroup" style="display: none;">
+                            <label for="prDistance">PR Distance</label>
+                            <div class="weight-input">
+                                <input type="number" id="prDistance" step="0.01" placeholder="0.00">
+                                <select id="distanceUnit">
+                                    <option value="m">m</option>
+                                    <option value="ft">ft</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group">
+                            <label for="sessionNotes">Session Notes (Optional)</label>
+                            <textarea id="sessionNotes" placeholder="How did the session feel? Technical focus areas?"></textarea>
+                        </div>
+
+                        <!-- Coach Notes -->
+                        <div class="form-group">
+                            <label for="coachNotes">Coach Notes (Optional)</label>
+                            <textarea id="coachNotes" placeholder="Feedback from your coach..."></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn">
+                            <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
+                            Log Session
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- History Tab -->
+            <section class="tab-content" id="tab-history">
+                <div class="card">
+                    <div class="history-header">
+                        <div>
+                            <h2 class="card-title">Session History</h2>
+                            <span class="card-subtitle">All your logged sessions</span>
+                        </div>
+                        <button class="export-btn" id="exportBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            CSV
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-wrapper">
+                        <button class="filters-toggle" id="filtersToggle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                            </svg>
+                            <span>Filter</span>
+                            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"/>
+                            </svg>
+                        </button>
+                        <div class="filters collapsed" id="filtersPanel">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label>Event</label>
+                                    <select id="filterEvent">
+                                        <option value="all">All Events</option>
+                                        <option value="shot-put">Shot Put</option>
+                                        <option value="discus">Discus</option>
+                                        <option value="hammer">Hammer</option>
+                                        <option value="javelin">Javelin</option>
+                                        <option value="weight-throw">Weight Throw</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Season</label>
+                                    <select id="filterSeason">
+                                        <option value="all">All</option>
+                                        <option value="indoor">Indoor</option>
+                                        <option value="outdoor">Outdoor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label>Type</label>
+                                    <select id="filterType">
+                                        <option value="all">All Types</option>
+                                        <option value="technique">Technique</option>
+                                        <option value="power">Power</option>
+                                        <option value="competition">Competition</option>
+                                        <option value="recovery">Recovery</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>PRs Only</label>
+                                    <div class="toggle-switch small">
+                                        <input type="checkbox" id="filterPR">
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="clear-filters-btn" id="clearFilters">Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Session List -->
+                    <div class="session-list" id="sessionList">
+                        <div class="empty-state">
+                            <svg class="empty-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                                <rect x="9" y="3" width="6" height="4" rx="1"/>
+                            </svg>
+                            <p>No sessions logged yet</p>
+                            <p class="empty-hint">Start by logging your first session!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Tab -->
+            <section class="tab-content" id="tab-analytics">
+                <!-- Training Analysis Card -->
+                <div class="card analysis-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Training Analysis</h2>
+                        <span class="card-subtitle">Smart insights for your training</span>
+                    </div>
+                    <div class="analysis-content" id="analysisContent">
+                        <div class="analysis-status" id="analysisStatus">
+                            <div class="analysis-icon neutral" id="analysisIcon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                            <div class="analysis-message">
+                                <h3 id="analysisTitle">Start Logging Sessions</h3>
+                                <p id="analysisText">Log your training sessions to receive personalized insights and recommendations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Season Summary Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Season Summary</h2>
+                        <select class="inline-select" id="summarySeasonFilter">
+                            <option value="all">All Time</option>
+                            <option value="indoor">Indoor</option>
+                            <option value="outdoor">Outdoor</option>
+                        </select>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                                </svg>
+                            </div>
+                            <span class="stat-value" id="totalSessions">0</span>
+                            <span class="stat-label">Sessions</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="12" cy="12" r="8"/>
+                                </svg>
+                            </div>
+                            <span class="stat-value" id="totalThrows">0</span>
+                            <span class="stat-label">Throws</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                            </div>
+                            <span class="stat-value" id="avgRPE">0.0</span>
+                            <span class="stat-label">Avg RPE</span>
+                        </div>
+                        <div class="stat-card highlight">
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+                                </svg>
+                            </div>
+                            <span class="stat-value" id="prCount">0</span>
+                            <span class="stat-label">PRs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Session Finder -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Session Finder</h2>
+                        <span class="card-subtitle">Filter by throws or RPE</span>
+                    </div>
+                    <div class="finder-controls">
+                        <select id="finderMetric">
+                            <option value="throws">Throws</option>
+                            <option value="rpe">RPE</option>
+                        </select>
+                        <select id="finderOperator">
+                            <option value="gte">≥</option>
+                            <option value="lte">≤</option>
+                            <option value="eq">=</option>
+                        </select>
+                        <input type="number" id="finderValue" placeholder="Value" min="0">
+                        <button class="finder-btn" id="finderApply">Find</button>
+                    </div>
+                    <div class="finder-results" id="finderResults"></div>
+                </div>
+
+                <!-- Event Breakdown -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Event Breakdown</h2>
+                        <span class="card-subtitle">Sessions per event</span>
+                    </div>
+                    <div class="event-breakdown" id="eventBreakdown">
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-icon shot-put"></div>
+                                <span>Shot Put</span>
+                            </div>
+                            <div class="breakdown-bar-wrapper">
+                                <div class="breakdown-bar shot-put" id="barShotPut"></div>
+                            </div>
+                            <span class="breakdown-count" id="countShotPut">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-icon discus"></div>
+                                <span>Discus</span>
+                            </div>
+                            <div class="breakdown-bar-wrapper">
+                                <div class="breakdown-bar discus" id="barDiscus"></div>
+                            </div>
+                            <span class="breakdown-count" id="countDiscus">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-icon hammer"></div>
+                                <span>Hammer</span>
+                            </div>
+                            <div class="breakdown-bar-wrapper">
+                                <div class="breakdown-bar hammer" id="barHammer"></div>
+                            </div>
+                            <span class="breakdown-count" id="countHammer">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-icon javelin"></div>
+                                <span>Javelin</span>
+                            </div>
+                            <div class="breakdown-bar-wrapper">
+                                <div class="breakdown-bar javelin" id="barJavelin"></div>
+                            </div>
+                            <span class="breakdown-count" id="countJavelin">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-icon weight-throw"></div>
+                                <span>Weight</span>
+                            </div>
+                            <div class="breakdown-bar-wrapper">
+                                <div class="breakdown-bar weight-throw" id="barWeightThrow"></div>
+                            </div>
+                            <span class="breakdown-count" id="countWeightThrow">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">This Week</h2>
+                        <span class="card-subtitle">Daily throws by event</span>
+                    </div>
+                    <div class="weekly-chart" id="weeklyChart"></div>
+                    <div class="chart-legend" id="chartLegend"></div>
+                </div>
+            </section>
+
+            <!-- Profile Tab -->
+            <section class="tab-content" id="tab-profile">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Athlete Profile</h2>
+                        <span class="card-subtitle">Your physical measurements</span>
+                    </div>
+                    
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="profileName">Full Name</label>
+                            <input type="text" id="profileName" placeholder="Your name">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profileAge">Age</label>
+                                <input type="number" id="profileAge" placeholder="18" min="10" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="profileGender">Gender</label>
+                                <select id="profileGender">
+                                    <option value="">Select</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profileHeight">Height</label>
+                                <div class="input-unit">
+                                    <input type="number" id="profileHeight" placeholder="180" step="0.1">
+                                    <select id="profileHeightUnit">
+                                        <option value="cm">cm</option>
+                                        <option value="in">in</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profileWeight">Weight</label>
+                                <div class="input-unit">
+                                    <input type="number" id="profileWeight" placeholder="80" step="0.1">
+                                    <select id="profileWeightUnit">
+                                        <option value="kg">kg</option>
+                                        <option value="lb">lb</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profileBodyFat">Body Fat %</label>
+                                <div class="input-unit">
+                                    <input type="number" id="profileBodyFat" placeholder="15" step="0.1" min="3" max="50">
+                                    <span class="unit-text">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profileWingspan">Wingspan</label>
+                                <div class="input-unit">
+                                    <input type="number" id="profileWingspan" placeholder="185" step="0.1">
+                                    <select id="profileWingspanUnit">
+                                        <option value="cm">cm</option>
+                                        <option value="in">in</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profileHandSize">Hand Size</label>
+                                <div class="input-unit">
+                                    <input type="number" id="profileHandSize" placeholder="22" step="0.1">
+                                    <select id="profileHandUnit">
+                                        <option value="cm">cm</option>
+                                        <option value="in">in</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profilePrimaryEvent">Primary Event</label>
+                                <select id="profilePrimaryEvent">
+                                    <option value="">Select</option>
+                                    <option value="shot-put">Shot Put</option>
+                                    <option value="discus">Discus</option>
+                                    <option value="hammer">Hammer</option>
+                                    <option value="javelin">Javelin</option>
+                                    <option value="weight-throw">Weight Throw</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileSchool">School / Team</label>
+                            <input type="text" id="profileSchool" placeholder="University or team name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileCoach">Coach Name</label>
+                            <input type="text" id="profileCoach" placeholder="Your coach's name">
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
+                            Save Profile
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Profile Summary -->
+                <div class="card" id="profileSummaryCard" style="display: none;">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Stats at a Glance</h2>
+                    </div>
+                    <div class="profile-summary" id="profileSummary"></div>
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section class="tab-content" id="tab-settings">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Settings</h2>
+                        <span class="card-subtitle">App preferences</span>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3 class="settings-subtitle">Default Units</h3>
+                        <div class="setting-row">
+                            <span>Weight</span>
+                            <select id="defaultWeightUnit">
+                                <option value="kg">Kilograms (kg)</option>
+                                <option value="lb">Pounds (lb)</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <span>Distance</span>
+                            <select id="defaultDistanceUnit">
+                                <option value="m">Meters (m)</option>
+                                <option value="ft">Feet (ft)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-subtitle">Data</h3>
+                        <button class="settings-btn" id="exportAllBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export All Data (JSON)
+                        </button>
+                        <button class="settings-btn danger" id="clearDataBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"/>
+                                <path d="M19,6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                <line x1="14" y1="11" x2="14" y2="17"/>
+                            </svg>
+                            Clear All Data
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">About</h2>
+                    </div>
+                    <div class="about-content">
+                        <p><strong>ThrowTracker</strong> v2.0</p>
+                        <p>Built for collegiate throwers to track sessions, monitor load, and optimize performance.</p>
+                        <p class="about-copyright">© 2024 ThrowTracker</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast -->
+        <div class="toast" id="toast">
+            <span class="toast-icon" id="toastIcon">✓</span>
+            <span class="toast-message" id="toastMessage">Saved!</span>
+        </div>
+
+        <!-- Session Modal -->
+        <div class="modal-overlay" id="sessionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Session Details</h3>
+                    <button class="modal-close" id="modalClose">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer">
+                    <button class="modal-btn delete" id="modalDelete">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"/>
+                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                        Delete
+                    </button>
+                    <button class="modal-btn primary" id="modalDone">Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan Modal -->
+        <div class="modal-overlay" id="planModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>What's your plan this week?</h3>
+                    <button class="modal-close" id="planModalClose">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="plan-prompt">Your recent sessions have been low intensity. What's the plan?</p>
+                    <div class="plan-options">
+                        <button class="plan-option" data-plan="recovery">
+                            <span class="plan-icon">😴</span>
+                            <span>Recovery Week</span>
+                        </button>
+                        <button class="plan-option" data-plan="deload">
+                            <span class="plan-icon">📉</span>
+                            <span>Deload / Taper</span>
+                        </button>
+                        <button class="plan-option" data-plan="ramp">
+                            <span class="plan-icon">📈</span>
+                            <span>Time to Ramp Up</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/sessions.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
